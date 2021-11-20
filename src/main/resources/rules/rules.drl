@@ -1,0 +1,8 @@
+package com.drools.example
+rule "Hello World"
+when
+helloWorldObject: HelloWorld()
+then
+helloWorldObject.showMessage();
+System.out.print(" from Drools!");
+end
