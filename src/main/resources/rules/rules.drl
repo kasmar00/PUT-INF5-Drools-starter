@@ -1,11 +1,4 @@
 package com.drools.example
-rule "Hello World"
-when
-    helloWorldObject: HelloWorld()
-then
-    helloWorldObject.showMessage();
-    System.out.println(" from Drools!");
-end
 
 rule "setup"
 when
