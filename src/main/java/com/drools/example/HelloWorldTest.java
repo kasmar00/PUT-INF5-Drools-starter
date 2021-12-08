@@ -23,6 +23,9 @@ public class HelloWorldTest {
         HelloWorld helloWorld = new HelloWorld();
         helloWorld.setPrintMessage("Hello World");
         session.insert(helloWorld);
+//        session.insert(new Pomiar(1, 200));
+        session.fireAllRules();
+        session.insert(new Straz());
         session.fireAllRules();
     }
 }
