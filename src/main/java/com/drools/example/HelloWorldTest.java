@@ -7,6 +7,9 @@ import org.drools.compiler.compiler.DroolsParserException;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.api.runtime.KieSession;
+import pl.poznan.put.cs.ai.drools.family.Osoba;
+import pl.poznan.put.cs.ai.drools.family.Relacja;
+
 public class HelloWorldTest {
     public static void main(String[] args) throws DroolsParserException,
             IOException {
@@ -22,6 +25,15 @@ public class HelloWorldTest {
         KieSession session = kContainer.newKieSession("ksession-rules");
         HelloWorld helloWorld = new HelloWorld();
         helloWorld.setPrintMessage("Hello World");
+
+//        Osoba abacki = new Osoba("abacki");
+//        Osoba cabacki = new Osoba("babacki");
+//
+//        Relacja relacja = new Relacja(abacki, cabacki, "rodzic");
+
+//        System.out.println(relacja);
+
+
         session.insert(helloWorld);
         session.fireAllRules();
     }

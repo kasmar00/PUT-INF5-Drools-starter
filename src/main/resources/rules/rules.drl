@@ -1,8 +1,159 @@
-package com.drools.example
-rule "Hello World"
-when
-helloWorldObject: HelloWorld()
-then
-helloWorldObject.showMessage();
-System.out.print(" from Drools!");
-end
+package pl.poznan.put.cs.ai.drools.family;
+
+
+import pl.poznan.put.cs.ai.drools.family.Relacja
+import java.sql.SQLOutput;
+//            Maria-Piotr        Ewa-Adam
+//            -----------        --------
+//              /  |  \          /  |  \
+//             /   |   \        /   |   \
+//            /  Marek  \      /  Joanna \
+// Robert-Agata         Jan-Anna         Krzysztof-Agnieszka
+// ------------         --------         -------------------
+//     /  \               /  \                   /  \
+//    /    \             /    \                 /    \
+//   /      \           /      \               /      \
+// Radek   Beata      Darek   Tomek         Jacek    Iwona
+
+rule "Init"
+	when
+    then
+		Osoba maria          = new Osoba("Maria");
+		Osoba ewa            = new Osoba("Ewa");
+		Osoba agata          = new Osoba("Agata");
+		Osoba anna           = new Osoba("Anna");
+		Osoba agnieszka      = new Osoba("Agnieszka");
+		Osoba beata          = new Osoba("Beata");
+		Osoba iwona          = new Osoba("Iwona");
+		Osoba joanna         = new Osoba("Joanna");
+		Osoba piotr          = new Osoba("Piotr");
+		Osoba adam           = new Osoba("Adam");
+		Osoba marek          = new Osoba("Marek");
+		Osoba robert         = new Osoba("Robert");
+		Osoba jan            = new Osoba("Jan");
+		Osoba krzysztof      = new Osoba("Krzysztof");
+		Osoba radek          = new Osoba("Radek");
+		Osoba darek          = new Osoba("Darek");
+		Osoba tomek          = new Osoba("Tomek");
+		Osoba jacek          = new Osoba("Jacek");
+
+		insert(new Relacja(maria,marek,"rodzic"));
+		insert(new Relacja(maria,agata,"rodzic"));
+		insert(new Relacja(maria,jan,"rodzic"));
+		insert(new Relacja(piotr,marek,"rodzic"));
+		insert(new Relacja(piotr,agata,"rodzic"));
+		insert(new Relacja(piotr,jan,"rodzic"));
+		insert(new Relacja(ewa,anna,"rodzic"));
+		insert(new Relacja(ewa,joanna,"rodzic"));
+		insert(new Relacja(ewa,krzysztof,"rodzic"));
+		insert(new Relacja(adam,anna,"rodzic"));
+		insert(new Relacja(adam,joanna,"rodzic"));
+		insert(new Relacja(adam,krzysztof,"rodzic"));
+		insert(new Relacja(agata,radek,"rodzic"));
+		insert(new Relacja(agata,beata,"rodzic"));
+		insert(new Relacja(robert,radek,"rodzic"));
+		insert(new Relacja(robert,beata,"rodzic"));
+		insert(new Relacja(anna,darek,"rodzic"));
+		insert(new Relacja(anna,tomek,"rodzic"));
+		insert(new Relacja(jan,darek,"rodzic"));
+		insert(new Relacja(jan,tomek,"rodzic"));
+		insert(new Relacja(agnieszka,jacek,"rodzic"));
+		insert(new Relacja(agnieszka,iwona,"rodzic"));
+		insert(new Relacja(krzysztof,jacek,"rodzic"));
+		insert(new Relacja(krzysztof,iwona,"rodzic"));
+
+		System.out.println("aaaaa");
+end;
+
+
+rule "left woman"
+    when
+        relacja: Relacja(osoby[0].toString().matches("(.*)a") == true && osoby[0].plec == Plec.NIEZNANA);
+    then
+        Osoba osoba=relacja.osoby[0];
+        osoba.plec = Plec.KOBIETA;
+        System.out.println("adding kobieta to "+osoba);
+        for (Relacja r : osoba.relacje) {
+            update(r);
+        }
+end;
+
+rule "left man"
+    when
+        relacja: Relacja(osoby[0].toString().matches("(.*)a") == false && osoby[0].plec == Plec.NIEZNANA);
+    then
+        Osoba osoba=relacja.osoby[0];
+        osoba.plec = Plec.MEZCZYZNA;
+        System.out.println("adding mężczyzna to "+osoba);
+        for (Relacja r : osoba.relacje) {
+            update(r);
+        }
+end;
+
+
+rule "right woman"
+    when
+        relacja: Relacja(osoby[1].toString().matches("(.*)a") == true && osoby[1].plec == Plec.NIEZNANA);
+    then
+        Osoba osoba=relacja.osoby[1];
+        osoba.plec = Plec.KOBIETA;
+        System.out.println("adding kobieta to "+osoba);
+        for (Relacja r : osoba.relacje) {
+            update(r);
+        }
+end;
+
+rule "right man"
+    when
+        relacja: Relacja(osoby[1].toString().matches("(.*)a") == false && osoby[1].plec == Plec.NIEZNANA);
+    then
+        Osoba osoba=relacja.osoby[1];
+        osoba.plec = Plec.MEZCZYZNA;
+        System.out.println("adding mężczyzna to "+osoba);
+        for (Relacja r : osoba.relacje) {
+            update(r);
+        }
+end;
+
+rule "ojciec"
+    when
+        r: Relacja(osoby[0].plec==Plec.MEZCZYZNA && relacja=="rodzic");
+    then
+        Relacja nowy = new Relacja(r.osoby[0], r.osoby[1], "ojciec");
+        insert(nowy);
+end;
+
+rule "matka"
+    when
+        r: Relacja(osoby[0].plec==Plec.KOBIETA && relacja=="rodzic");
+    then
+        Relacja nowy = new Relacja(r.osoby[0], r.osoby[1], "matka");
+        insert(nowy);
+end;
+
+rule "babcia"
+    when
+        r1: Relacja(relacja=="matka") and
+        r2: Relacja(relacja=="rodzic" && r1.osoby[1]==osoby[0]);
+    then
+        Relacja nowy = new Relacja(r1.osoby[0], r2.osoby[1], "babcia");
+        insert (nowy);
+end;
+
+rule "dziadek"
+    when
+        r1: Relacja(relacja=="ojciec") and
+        r2: Relacja(relacja=="rodzic" && r1.osoby[1]==osoby[0]);
+    then
+        Relacja nowy = new Relacja(r1.osoby[0], r2.osoby[1], "dziadek");
+        insert (nowy);
+end;
+
+rule "brat"
+    when
+        r1: Relacja(relacja=="rodzic" && osoby[1].plec==Plec.MEZCZYZNA) and
+        r2: Relacja(relacja=="rodzic" && r1.osoby[0]==osoby[0] && r1.osoby[1]!=osoby[1]);
+    then
+        Relacja nowy = new Relacja(r1.osoby[1], r2.osoby[1], "brat");
+        insert (nowy);
+end;
